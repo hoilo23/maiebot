@@ -8,7 +8,7 @@ import string
 import datetime
 from bs4 import BeautifulSoup
 
-updater = Updater(token='585735982:AAGitzRpRi4z3AzEUrC9DPQBYV6G3_XmrU8')  # @v2_MaieBot
+updater = Updater(token='api_key')  # @v2_MaieBot
 dispatcher = updater.dispatcher
 
 
