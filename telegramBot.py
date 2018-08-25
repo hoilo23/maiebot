@@ -5,10 +5,10 @@ import posixpath
 import urllib.parse
 import requests
 import string
-import datetime
+from datetime import datetime
 from bs4 import BeautifulSoup
 
-updater = Updater(token='api_key')  # @v2_MaieBot
+updater = Updater(token='api_key')
 dispatcher = updater.dispatcher
 
 
@@ -20,7 +20,7 @@ def random_string(length):
 
 # sends all of the available commands
 def send_help(bot, update):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     all_commands = '''
@@ -43,7 +43,7 @@ dispatcher.add_handler(send_help_handler)
 
 # opens chat_id.txt and sends a random quote to the chat
 def get_quote(bot, update):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     try:
@@ -62,7 +62,7 @@ dispatcher.add_handler(get_quote_handler)
 
 # opens quotes_chat_id.txt and appends the quote
 def add_quote(bot, update, args):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     all_words = ''
@@ -84,7 +84,7 @@ dispatcher.add_handler(add_quote_handler)
 
 # sends a google URL with the args as the search q
 def send_google_url(bot, update, args):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     all_keywords = ''
@@ -103,7 +103,7 @@ dispatcher.add_handler(send_google_url_handler)
 
 # sends a random reply from the list
 def magic8ball(bot, update):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     answers = ['It is certain', 'It is decidedly so', 'Without a doubt',
@@ -122,7 +122,7 @@ dispatcher.add_handler(magic8ball_handler)
 
 # sends a random reply from the args
 def wheeldecide(bot, update, args):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     list_of_decisions = []
@@ -141,7 +141,7 @@ dispatcher.add_handler(wheeldecide_handler)
 
 # dogify
 def send_doge_pic(bot, update, args):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     all_words = ''
@@ -160,7 +160,7 @@ dispatcher.add_handler(send_doge_pic_handler)
 
 # kicks person that executed the command
 def kickme(bot, update):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     print(update.message.from_user)
@@ -173,7 +173,7 @@ dispatcher.add_handler(kickme_handler)
 
 # sets image in reply as group picture
 def grouppic(bot, update):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     if update['message']['reply_to_message'] is not None:
@@ -195,7 +195,7 @@ dispatcher.add_handler(grouppic_handler)
 
 # isup
 def isup(bot, update, args):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     print(args)
@@ -233,7 +233,7 @@ dispatcher.add_handler(isup_handler)
 
 # echo
 def echo(bot, update, args):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     all_words = ''
@@ -252,7 +252,7 @@ dispatcher.add_handler(echo_handler)
 
 # send image as file
 def send_media_from_url(bot, update):
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
     image_extensions = {'.png', '.jpg'}
