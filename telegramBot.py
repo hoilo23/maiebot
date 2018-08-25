@@ -7,15 +7,31 @@ import requests
 import string
 from datetime import datetime
 from bs4 import BeautifulSoup
+import os
+from functools import wraps
+from ftplib import FTP
 
 updater = Updater(token='api_key')
 dispatcher = updater.dispatcher
 
 
-# generates a random string
-def random_string(length):
-    x = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
-    print(x)
+api_key = ''
+list_of_admins = []
+ftp_username = ''
+ftp_password = ''
+ftp_url = ''
+
+
+def restricted(func):
+    @wraps(func)
+    def wrapped(bot, update, *args, **kwargs):
+        user_id = update.effective_user.id
+        if user_id not in list_of_admins:
+            print("Unauthorized access denied for {}.".format(user_id))
+            bot.send_message(chat_id=update.message.chat_id, text='Permission denied')
+            return
+        return func(bot, update, *args, **kwargs)
+    return wrapped
 
 
 # sends all of the available commands
@@ -191,6 +207,68 @@ def grouppic(bot, update):
 
 grouppic_handler = CommandHandler('setpic', grouppic)
 dispatcher.add_handler(grouppic_handler)
+
+
+# Replies to a file with a http link to that same file.
+def upload_file(bot, update):
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print('Message text: ' + update.message.text)
+
+    if update['message']['reply_to_message'] is None:
+        bot.send_message(chat_id=update.message.chat_id, text='Not a reply!')
+        return
+    if update['message']['reply_to_message']['document'] is None:
+        bot.send_message(chat_id=update.message.chat_id, text='Not a reply to a file!')
+        return
+    if update['message']['reply_to_message']['document']['file_size'] > 10485760:
+        bot.send_message(chat_id=update.message.chat_id, text='File too big, you can only upload files <10MB')
+        return
+
+    file_update = update['message']['reply_to_message']['document']
+
+    random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=14))
+    file_extension = posixpath.splitext(urllib.parse.urlparse(file_update['file_name']).path)[1]
+
+    random_filename = random_string + file_extension
+
+    file = bot.get_file(file_id=file_update['file_id'])
+    file.download(random_filename)
+    open_file = open(random_filename, 'rb')
+
+    ftp = FTP(ftp_url)
+    ftp.login(user=ftp_username, passwd=ftp_password)
+    ftp.storbinary('STOR ' + random_filename, open_file)
+    open_file.close()
+    ftp.quit()
+
+    os.remove(random_filename)
+
+    file_url = 'https://www.' + ftp_url + '/files/' + random_filename
+    bot.send_message(chat_id=update.message.chat_id, text='Successfully uploaded your file: ' + file_url)
+
+
+upload_file_handler = CommandHandler('upload', upload_file)
+dispatcher.add_handler(upload_file_handler)
+
+
+@restricted
+def delete_all_files(bot, update):
+    print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
+    print('Message text: ' + update.message.text)
+
+    ftp = FTP(ftp_url)
+    ftp.login(user=ftp_username, passwd=ftp_password)
+    for file in ftp.nlst():
+        try:
+            ftp.delete(file)
+        except:
+            print('failed')
+            continue
+    bot.send_message(chat_id=update.message.chat_id, text='Successfully deleted all files')
+
+
+delete_all_files_handler = CommandHandler('delete_all_files', delete_all_files)
+dispatcher.add_handler(delete_all_files_handler)
 
 
 # isup
