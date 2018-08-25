@@ -10,16 +10,23 @@ from bs4 import BeautifulSoup
 import os
 from functools import wraps
 from ftplib import FTP
+import json
 
-updater = Updater(token='api_key')
+
+# load config.json
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+api_key = config['TELEGRAM']['API_KEY']
+list_of_admins = config['TELEGRAM']['LIST_OF_ADMINS']
+
+ftp_url = config['FTP']['URL']
+ftp_username = config['FTP']['USERNAME']
+ftp_password = config['FTP']['PASSWORD']
+
+
+updater = Updater(token=api_key)
 dispatcher = updater.dispatcher
-
-
-api_key = ''
-list_of_admins = []
-ftp_username = ''
-ftp_password = ''
-ftp_url = ''
 
 
 def restricted(func):
@@ -49,6 +56,8 @@ def send_help(bot, update):
     /dogify - Create a doge image with your words
     /kickme - Kick you from the chat
     /setpic - Set the picture you replied to as group avatar
+    /upload - Uploads the file you replied to, and returns the URL
+    /delete_all_files - Deletes all of the uploaded files in the FTP.
     '''
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
 
@@ -214,17 +223,14 @@ def upload_file(bot, update):
     print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
-    if update['message']['reply_to_message'] is None:
-        bot.send_message(chat_id=update.message.chat_id, text='Not a reply!')
-        return
-    if update['message']['reply_to_message']['document'] is None:
+    file_update = update['message']['reply_to_message']['document']
+
+    if file_update is None:
         bot.send_message(chat_id=update.message.chat_id, text='Not a reply to a file!')
         return
-    if update['message']['reply_to_message']['document']['file_size'] > 10485760:
+    if file_update['file_size'] > 10485760:
         bot.send_message(chat_id=update.message.chat_id, text='File too big, you can only upload files <10MB')
         return
-
-    file_update = update['message']['reply_to_message']['document']
 
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=14))
     file_extension = posixpath.splitext(urllib.parse.urlparse(file_update['file_name']).path)[1]
@@ -251,6 +257,7 @@ upload_file_handler = CommandHandler('upload', upload_file)
 dispatcher.add_handler(upload_file_handler)
 
 
+# deletes all of the files in the FTP folder
 @restricted
 def delete_all_files(bot, update):
     print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
@@ -262,7 +269,6 @@ def delete_all_files(bot, update):
         try:
             ftp.delete(file)
         except:
-            print('failed')
             continue
     bot.send_message(chat_id=update.message.chat_id, text='Successfully deleted all files')
 
@@ -276,7 +282,6 @@ def isup(bot, update, args):
     print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
-    print(args)
     if not args:
         bot.send_message(chat_id=update.message.chat_id, text='Please enter a URL to check')
         return
@@ -284,8 +289,7 @@ def isup(bot, update, args):
         if len(args) > 1:
             bot.send_message(chat_id=update.message.chat_id, text='Please enter a valid URL')
             return
-        for urls in args:
-            url = urls
+        url = args[0]
     if 'https://' not in url and 'http://' not in url:  # if no http(s) in url, add it, and check if url is up
         url = 'http://' + url  # add http to url
         try:
@@ -356,10 +360,8 @@ def send_media_from_url(bot, update):
             bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
             url = 'http://rapflame.ddns.net:8080/pf/pf-full.php?user=' + username
             r = requests.get(url)
-            data = r.text
-            soup = BeautifulSoup(data, "lxml")
-            for link in soup.find_all('img'):
-                image = link.get("src")
+            soup = BeautifulSoup(r.text, 'lxml')
+            image = soup.find('img')['src']
             bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
     # checks every received URL if it is a direct link to a file, and returns the file itself if it is
