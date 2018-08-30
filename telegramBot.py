@@ -9,9 +9,11 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import os
 from functools import wraps
-from ftplib import FTP
+import ftplib
 import json
+import logging
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # load config.json
 with open('config.json', 'r') as f:
@@ -62,7 +64,7 @@ def send_help(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
 
 
-send_help_handler = CommandHandler('help', help)
+send_help_handler = CommandHandler('help', send_help)
 dispatcher.add_handler(send_help_handler)
 
 
@@ -201,17 +203,18 @@ def grouppic(bot, update):
     print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
-    if update['message']['reply_to_message'] is not None:
-        if update['message']['reply_to_message']['photo']:
-            photo_update = update['message']['reply_to_message']['photo'][-1]
-            profile_pic = bot.get_file(file_id=photo_update['file_id'])
-            profile_pic.download('avatar.jpg')
-            with open('avatar.jpg', 'rb') as f:
-                bot.set_chat_photo(update.message.chat_id, f)
-        else:
-            bot.send_message(chat_id=update.message.chat_id, text='Not a reply to an image!')
-    else:
+    if update['message']['reply_to_message'] is None:
         bot.send_message(chat_id=update.message.chat_id, text='Not a reply!')
+        return
+    if not update['message']['reply_to_message']['photo']:
+        bot.send_message(chat_id=update.message.chat_id, text='Not a reply to an image!')
+        return
+
+    photo_update = update['message']['reply_to_message']['photo'][-1]
+    profile_pic = bot.get_file(file_id=photo_update['file_id'])
+    profile_pic.download('avatar.jpg')
+    with open('avatar.jpg', 'rb') as file:
+        bot.set_chat_photo(update.message.chat_id, file)
 
 
 grouppic_handler = CommandHandler('setpic', grouppic)
@@ -219,37 +222,61 @@ dispatcher.add_handler(grouppic_handler)
 
 
 # Replies to a file with a http link to that same file.
+@restricted
 def upload_file(bot, update):
     print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
-    file_update = update['message']['reply_to_message']['document']
+    if not update['message']['reply_to_message']:
+        bot.send_message(chat_id=update.message.chat_id, text='Please reply to a file.')
+        return
 
-    if file_update is None:
-        bot.send_message(chat_id=update.message.chat_id, text='Not a reply to a file!')
+    document_update = update['message']['reply_to_message']['document']
+    video_update = update['message']['reply_to_message']['video']
+    photo_update = update['message']['reply_to_message']['photo']
+    audio_update = update['message']['reply_to_message']['audio']
+
+    if document_update:
+        file_update = document_update
+    elif video_update:
+        file_update = video_update
+    elif photo_update:
+        file_update = photo_update[-1]  # [-1] so it always uses the biggest photo available
+    elif audio_update:
+        file_update = audio_update
+    else:
+        bot.send_message(chat_id=update.message.chat_id, text='Please reply to a file.')
         return
-    if file_update['file_size'] > 10485760:
-        bot.send_message(chat_id=update.message.chat_id, text='File too big, you can only upload files <10MB')
+
+    if not file_update:
+        bot.send_message(chat_id=update.message.chat_id, text='Please reply to a file, photo, or video.')
         return
+    if file_update['file_size'] > 20971520:
+        bot.send_message(chat_id=update.message.chat_id, text='File too big, you can only upload files <20MiB')
+        return
+
+    def bot_get_file():
+        file = bot.get_file(file_id=file_update['file_id'])
+        return file.download()
+
+    file_name = bot_get_file()
+    bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_DOCUMENT)
+    open_file = open(file_name, 'rb')
 
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=14))
-    file_extension = posixpath.splitext(urllib.parse.urlparse(file_update['file_name']).path)[1]
+    file_extension = posixpath.splitext(urllib.parse.urlparse(file_name).path)[1]
 
     random_filename = random_string + file_extension
 
-    file = bot.get_file(file_id=file_update['file_id'])
-    file.download(random_filename)
-    open_file = open(random_filename, 'rb')
-
-    ftp = FTP(ftp_url)
+    ftp = ftplib.FTP(ftp_url)
     ftp.login(user=ftp_username, passwd=ftp_password)
     ftp.storbinary('STOR ' + random_filename, open_file)
     open_file.close()
     ftp.quit()
 
-    os.remove(random_filename)
+    os.remove(file_name)
 
-    file_url = 'https://www.' + ftp_url + '/files/' + random_filename
+    file_url = 'https://files.' + ftp_url + '/' + random_filename
     bot.send_message(chat_id=update.message.chat_id, text='Successfully uploaded your file: ' + file_url)
 
 
@@ -263,13 +290,21 @@ def delete_all_files(bot, update):
     print(datetime.now().strftime("%Y-%m-%d %H:%M") + ': New message from ' + update.message.from_user.username)
     print('Message text: ' + update.message.text)
 
-    ftp = FTP(ftp_url)
+    ftp = ftplib.FTP(ftp_url)
     ftp.login(user=ftp_username, passwd=ftp_password)
-    for file in ftp.nlst():
+
+    list_of_files = ftp.nlst()[3:]  # delete first 3 entrys from list ('.', '..', and '.htaccess')
+
+    if not list_of_files:
+        bot.send_message(chat_id=update.message.chat_id, text='Folder is already empty')
+        return
+
+    for file in list_of_files:
         try:
             ftp.delete(file)
-        except:
+        except ftplib.error_perm:
             continue
+
     bot.send_message(chat_id=update.message.chat_id, text='Successfully deleted all files')
 
 
@@ -390,4 +425,4 @@ def send_media_from_url(bot, update):
 send_media_from_url_handler = MessageHandler((Filters.entity("url")), send_media_from_url)
 dispatcher.add_handler(send_media_from_url_handler)
 
-updater.start_polling()
+updater.start_polling(clean=True)
