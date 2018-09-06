@@ -12,7 +12,7 @@ from functools import wraps
 import ftplib
 import json
 import logging
-import tweepy
+import tweepy  # used by /tweet command
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -100,11 +100,9 @@ dispatcher.add_handler(get_quote_handler)
 def add_quote(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
-    all_words = ''
     with open(f'./quotes/{update.message.chat_id}.txt', 'a', encoding='utf-8') as list_of_quotes:
-        for word in args:
-            all_words += word
-            all_words += ' '
+        # join the list of words into a single string
+        all_words = ' '.join(args)
         if all_words == '':
             bot.send_message(chat_id=update.message.chat_id, text='Please enter a quote!')
         else:
@@ -124,13 +122,10 @@ def send_tweet(bot, update, args):
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
 
-    all_words = ''
+    # join the list of words into a single string
+    all_words = ' '.join(args)
 
-    for word in args:
-        all_words += word
-        all_words += ' '
-
-    status = api.update_status(status=all_words)
+    api.update_status(status=all_words)
 
     bot.send_message(chat_id=update.message.chat_id, text='Tweet send: https://twitter.com/GertKwarckman')
 
@@ -143,10 +138,9 @@ dispatcher.add_handler(send_tweet_handler)
 def send_google_url(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
-    all_keywords = ''
-    for word in args:
-        all_keywords += word
-        all_keywords += '+'
+    # join the list of words into a single string with '+' between every word
+    all_keywords = '+'.join(args)
+
     if all_keywords:
         bot.send_message(chat_id=update.message.chat_id, text=f'https://www.google.com/search?q={all_keywords}')
     else:
@@ -196,10 +190,8 @@ dispatcher.add_handler(wheeldecide_handler)
 def send_doge_pic(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
-    all_words = ''
-    for word in args:
-        all_words += word
-        all_words += ' '
+    # join the list of words into a single string
+    all_words = ' '.join(args)
     if all_words == '':
         bot.send_message(chat_id=update.message.chat_id, text='Please enter text!')
     else:
@@ -371,13 +363,11 @@ dispatcher.add_handler(isup_handler)
 def echo(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
-    all_words = ''
     if not args:
         bot.send_message(chat_id=update.message.chat_id, text='Please enter some text')
     else:
-        for word in args:
-            all_words += word
-            all_words += ' '
+        # join the list of words into a single string
+        all_words = ' '.join(args)
         bot.send_message(chat_id=update.message.chat_id, text=all_words)
 
 
