@@ -12,6 +12,7 @@ from functools import wraps
 import ftplib
 import json
 import logging
+import tweepy
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -25,6 +26,11 @@ list_of_admins = config['TELEGRAM']['LIST_OF_ADMINS']
 ftp_url = config['FTP']['URL']
 ftp_username = config['FTP']['USERNAME']
 ftp_password = config['FTP']['PASSWORD']
+
+consumer_key = config['TWITTER']['CONSUMER_KEY']
+consumer_secret = config['TWITTER']['CONSUMER_SECRET']
+access_token = config['TWITTER']['ACCESS_TOKEN']
+access_token_secret = config['TWITTER']['ACCESS_TOKEN_SECRET']
 
 
 updater = Updater(token=api_key)
@@ -64,6 +70,7 @@ def send_help(bot, update):
     /setpic - Set the picture you replied to as group avatar
     /upload - Uploads the file you replied to, and returns the URL
     /delete_all_files - Deletes all of the uploaded files in the FTP.
+    /tweet - Tweet your message
     '''
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
 
@@ -107,6 +114,29 @@ def add_quote(bot, update, args):
 
 add_quote_handler = CommandHandler('addquote', add_quote, pass_args=True)
 dispatcher.add_handler(add_quote_handler)
+
+
+# sends args as tweet
+def send_tweet(bot, update, args):
+    new_message(update.message.from_user.username, update.message.text)
+
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth)
+
+    all_words = ''
+
+    for word in args:
+        all_words += word
+        all_words += ' '
+
+    status = api.update_status(status=all_words)
+
+    bot.send_message(chat_id=update.message.chat_id, text='Tweet send: https://twitter.com/GertKwarckman')
+
+
+send_tweet_handler = CommandHandler('tweet', send_tweet, pass_args=True)
+dispatcher.add_handler(send_tweet_handler)
 
 
 # sends a google URL with the args as the search q
