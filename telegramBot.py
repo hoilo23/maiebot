@@ -41,7 +41,7 @@ def restricted(func):
     def wrapped(bot, update, *args, **kwargs):
         user_id = update.effective_user.id
         if user_id not in list_of_admins:
-            print(f"Unauthorized access denied for {update.effective_user.id}.")
+            print(f'Unauthorized access denied for {update.effective_user.id}.')
             bot.send_message(chat_id=update.message.chat_id, text='Permission denied')
             return
         return func(bot, update, *args, **kwargs)
@@ -77,7 +77,7 @@ def get_quote(bot, update):
     new_message(update.message.from_user.username, update.message.text)
 
     try:
-        with open(f'./quotes/{update.message.chat_id}.txt', 'r', encoding="utf-8") as list_of_quotes:
+        with open(f'./quotes/{update.message.chat_id}.txt', 'r', encoding='utf-8') as list_of_quotes:
             quotes = list_of_quotes.readlines()
             quote = quotes[random.randint(0, len(quotes) - 1)]
             bot.send_message(chat_id=update.message.chat_id, text=quote)
@@ -94,15 +94,15 @@ def add_quote(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
     all_words = ''
-    list_of_quotes = open(f'./quotes/{update.message.chat_id}.txt', 'a', encoding="utf-8")
-    for word in args:
-        all_words += word
-        all_words += ' '
-    if all_words == '':
-        bot.send_message(chat_id=update.message.chat_id, text='Please enter a quote!')
-    else:
-        list_of_quotes.write(f'{all_words} \n')
-        bot.send_message(chat_id=update.message.chat_id, text='done!')
+    with open(f'./quotes/{update.message.chat_id}.txt', 'a', encoding='utf-8') as list_of_quotes:
+        for word in args:
+            all_words += word
+            all_words += ' '
+        if all_words == '':
+            bot.send_message(chat_id=update.message.chat_id, text='Please enter a quote!')
+        else:
+            list_of_quotes.write(f'{all_words} \n')
+            bot.send_message(chat_id=update.message.chat_id, text='done!')
 
 
 add_quote_handler = CommandHandler('addquote', add_quote, pass_args=True)
@@ -283,8 +283,7 @@ def delete_all_files(bot, update):
     ftp = ftplib.FTP(ftp_url)
     ftp.login(user=ftp_username, passwd=ftp_password)
 
-    list_of_files = ftp.nlst()
-    list_of_files.remove('.htaccess')  # we don't want to delete the .htaccess file
+    list_of_files = ftp.nlst()[3:]  # delete first 3 entries from list ('.', '..', and '.htaccess')
 
     if not list_of_files:
         bot.send_message(chat_id=update.message.chat_id, text='Folder is already empty')
@@ -410,7 +409,7 @@ def send_media_from_url(bot, update):
         bot.send_video(chat_id=update.message.chat_id, video=url)
 
 
-send_media_from_url_handler = MessageHandler((Filters.entity("url")), send_media_from_url)
+send_media_from_url_handler = MessageHandler((Filters.entity('url')), send_media_from_url)
 dispatcher.add_handler(send_media_from_url_handler)
 
 updater.start_polling(clean=True)
