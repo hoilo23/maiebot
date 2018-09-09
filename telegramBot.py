@@ -70,7 +70,7 @@ def send_help(bot, update):
     /setpic - Set the picture you replied to as group avatar
     /upload - Uploads the file you replied to, and returns the URL
     /delete_all_files - Deletes all of the uploaded files in the FTP.
-    /tweet - Tweet your message
+    /tweet - Tweet your message.
     /getid [group] - Get your user id, or the groups id.
     '''
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
