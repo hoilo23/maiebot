@@ -7,10 +7,10 @@ import requests
 import string
 from datetime import datetime
 from bs4 import BeautifulSoup
-import os
+import os  # used for os.remove
 from functools import wraps
-import ftplib
-import json
+import ftplib  # used for /upload
+import json  # used for the config.json file
 import logging
 import tweepy  # used by /tweet command
 
@@ -70,14 +70,12 @@ def send_help(bot, update):
     /setpic - Set the picture you replied to as group avatar
     /upload - Uploads the file you replied to, and returns the URL
     /delete_all_files - Deletes all of the uploaded files in the FTP.
+    /isup - Checks if a URL is working or not
+    /echo - Echoes your message
     /tweet - Tweet your message.
     /getid [group] - Get your user id, or the groups id.
     '''
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
-
-
-send_help_handler = CommandHandler('help', send_help)
-dispatcher.add_handler(send_help_handler)
 
 
 # opens chat_id.txt and sends a random quote to the chat
@@ -91,10 +89,6 @@ def get_quote(bot, update):
             bot.send_message(chat_id=update.message.chat_id, text=quote)
     except FileNotFoundError:
         bot.send_message(chat_id=update.message.chat_id, text='No quotes found.')
-
-
-get_quote_handler = CommandHandler('quote', get_quote)
-dispatcher.add_handler(get_quote_handler)
 
 
 # opens quotes_chat_id.txt and appends the quote
@@ -111,10 +105,6 @@ def add_quote(bot, update, args):
             bot.send_message(chat_id=update.message.chat_id, text='done!')
 
 
-add_quote_handler = CommandHandler('addquote', add_quote, pass_args=True)
-dispatcher.add_handler(add_quote_handler)
-
-
 # sends the current group chat id or the users id
 def getid(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
@@ -124,10 +114,6 @@ def getid(bot, update, args):
         return
     if args[0] == 'group':
         bot.send_message(chat_id=update.message.chat_id, text=update.message.chat_id)
-
-
-getid_handler = CommandHandler('getid', getid, pass_args=True)
-dispatcher.add_handler(getid_handler)
 
 
 # sends args as tweet
@@ -146,25 +132,29 @@ def send_tweet(bot, update, args):
     bot.send_message(chat_id=update.message.chat_id, text='Tweet send: https://twitter.com/GertKwarckman')
 
 
-send_tweet_handler = CommandHandler('tweet', send_tweet, pass_args=True)
-dispatcher.add_handler(send_tweet_handler)
-
-
-# sends a google URL with the args as the search q
-def send_google_url(bot, update, args):
+# sends a ddg result with the args as the search q
+def search_ddg(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
     # join the list of words into a single string with '+' between every word
     all_keywords = '+'.join(args)
 
-    if all_keywords:
-        bot.send_message(chat_id=update.message.chat_id, text=f'https://www.google.com/search?q={all_keywords}')
-    else:
-        bot.send_message(chat_id=update.message.chat_id, text='Please enter a search query!')
+    bot.send_chat_action(update.message.chat_id, ChatAction.TYPING)
+    url = f'https://duckduckgo.com/html/?q={all_keywords}'
 
-
-send_google_url_handler = CommandHandler('google', send_google_url, pass_args=True)
-dispatcher.add_handler(send_google_url_handler)
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'lxml')
+    image = soup.find('div', class_="result results_links results_links_deep web-result ")
+    # split the title, text and url in a list
+    image = image.text.splitlines()
+    # filter whitespace and empty strings from list
+    result = list(filter(None, image))[1:-1]
+    try:
+        result = f'{result[0]} \n\n{result[1]} \n\n{result[2]}'
+    except IndexError:
+        bot.send_message(chat_id=update.message.chat_id, text=f'No results found for {all_keywords}')
+        return
+    bot.send_message(chat_id=update.message.chat_id, text=result)
 
 
 # sends a random reply from the list
@@ -181,10 +171,6 @@ def magic8ball(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=answers[random.randint(0, len(answers) - 1)])
 
 
-magic8ball_handler = CommandHandler('magic8ball', magic8ball)
-dispatcher.add_handler(magic8ball_handler)
-
-
 # sends a random reply from the args
 def wheeldecide(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
@@ -196,10 +182,6 @@ def wheeldecide(bot, update, args):
     else:
         bot.send_message(chat_id=update.message.chat_id,
                          text=list_of_decisions[random.randint(0, len(list_of_decisions) - 1)])
-
-
-wheeldecide_handler = CommandHandler('wheeldecide', wheeldecide, pass_args=True)
-dispatcher.add_handler(wheeldecide_handler)
 
 
 # dogify
@@ -214,19 +196,11 @@ def send_doge_pic(bot, update, args):
         bot.send_photo(chat_id=update.message.chat_id, photo=f'http://dogr.io/{all_words}.png?split=false&.png')
 
 
-send_doge_pic_handler = CommandHandler('dogify', send_doge_pic, pass_args=True)
-dispatcher.add_handler(send_doge_pic_handler)
-
-
 # kicks person that executed the command
 def kickme(bot, update):
     new_message(update.message.from_user.username, update.message.text)
 
     bot.kick_chat_member(chat_id=update.message.chat_id, user_id=update.message.from_user['id'])
-
-
-kickme_handler = CommandHandler('kickme', kickme)
-dispatcher.add_handler(kickme_handler)
 
 
 # sets image in reply as group picture
@@ -245,10 +219,6 @@ def grouppic(bot, update):
     profile_pic.download('avatar.jpg')
     with open('avatar.jpg', 'rb') as file:
         bot.set_chat_photo(update.message.chat_id, file)
-
-
-grouppic_handler = CommandHandler('setpic', grouppic)
-dispatcher.add_handler(grouppic_handler)
 
 
 # Replies to a file with a http link to that same file.
@@ -309,10 +279,6 @@ def upload_file(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=f'Successfully uploaded your file: {file_url}')
 
 
-upload_file_handler = CommandHandler('upload', upload_file)
-dispatcher.add_handler(upload_file_handler)
-
-
 # deletes all of the files in the FTP folder
 @restricted
 def delete_all_files(bot, update):
@@ -334,10 +300,6 @@ def delete_all_files(bot, update):
             continue
 
     bot.send_message(chat_id=update.message.chat_id, text='Successfully deleted all files')
-
-
-delete_all_files_handler = CommandHandler('delete_all_files', delete_all_files)
-dispatcher.add_handler(delete_all_files_handler)
 
 
 # isup
@@ -371,10 +333,6 @@ def isup(bot, update, args):
             bot.send_message(chat_id=update.message.chat_id, text=f'{url} Looks down from here, RIP')
 
 
-isup_handler = CommandHandler('isup', isup, pass_args=True)
-dispatcher.add_handler(isup_handler)
-
-
 # echo
 def echo(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
@@ -385,10 +343,6 @@ def echo(bot, update, args):
         # join the list of words into a single string
         all_words = ' '.join(args)
         bot.send_message(chat_id=update.message.chat_id, text=all_words)
-
-
-echo_handler = CommandHandler('echo', echo, pass_args=True)
-dispatcher.add_handler(echo_handler)
 
 
 # send image as file
@@ -445,7 +399,23 @@ def send_media_from_url(bot, update):
         bot.send_video(chat_id=update.message.chat_id, video=url)
 
 
-send_media_from_url_handler = MessageHandler((Filters.entity('url')), send_media_from_url)
-dispatcher.add_handler(send_media_from_url_handler)
+# Command Handlers
+dispatcher.add_handler(CommandHandler('help', send_help))
+dispatcher.add_handler(CommandHandler('quote', get_quote))
+dispatcher.add_handler(CommandHandler('addquote', add_quote, pass_args=True))
+dispatcher.add_handler(CommandHandler('google', search_ddg, pass_args=True))
+dispatcher.add_handler(CommandHandler('magic8ball', magic8ball))
+dispatcher.add_handler(CommandHandler('wheeldecide', wheeldecide, pass_args=True))
+dispatcher.add_handler(CommandHandler('dogify', send_doge_pic, pass_args=True))
+dispatcher.add_handler(CommandHandler('kickme', kickme))
+dispatcher.add_handler(CommandHandler('setpic', grouppic))
+dispatcher.add_handler(CommandHandler('upload', upload_file))
+dispatcher.add_handler(CommandHandler('delete_all_files', delete_all_files))
+dispatcher.add_handler(CommandHandler('isup', isup, pass_args=True))
+dispatcher.add_handler(CommandHandler('echo', echo, pass_args=True))
+dispatcher.add_handler(CommandHandler('tweet', send_tweet, pass_args=True))
+dispatcher.add_handler(CommandHandler('getid', getid, pass_args=True))
+dispatcher.add_handler(MessageHandler((Filters.entity('url')), send_media_from_url))
+
 
 updater.start_polling(clean=True)
