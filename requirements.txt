@@ -1,6 +1,6 @@
 beautifulsoup4==4.6.1
 lxml==4.2.4
-python-telegram-bot==11.1.0
 requests==2.19.1
 telegram==0.0.1
 tweepy==3.6.0
+python-telegram-bot==11.1.0
