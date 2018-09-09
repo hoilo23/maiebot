@@ -71,6 +71,7 @@ def send_help(bot, update):
     /upload - Uploads the file you replied to, and returns the URL
     /delete_all_files - Deletes all of the uploaded files in the FTP.
     /tweet - Tweet your message
+    /getid [group] - Get your user id, or the groups id.
     '''
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
 
@@ -112,6 +113,21 @@ def add_quote(bot, update, args):
 
 add_quote_handler = CommandHandler('addquote', add_quote, pass_args=True)
 dispatcher.add_handler(add_quote_handler)
+
+
+# sends the current group chat id or the users id
+def getid(bot, update, args):
+    new_message(update.message.from_user.username, update.message.text)
+
+    if not args:
+        bot.send_message(chat_id=update.message.chat_id, text=update.message.from_user.id)
+        return
+    if args[0] == 'group':
+        bot.send_message(chat_id=update.message.chat_id, text=update.message.chat_id)
+
+
+getid_handler = CommandHandler('getid', getid, pass_args=True)
+dispatcher.add_handler(getid_handler)
 
 
 # sends args as tweet
