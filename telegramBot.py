@@ -1,5 +1,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ChatAction
+from telegram.error import BadRequest
 import random
 import posixpath
 import urllib.parse
@@ -13,6 +14,7 @@ import ftplib  # used for /upload
 import json  # used for the config.json file
 import logging
 import tweepy  # used by /tweet command
+import urllib.request
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -351,7 +353,7 @@ def send_media_from_url(bot, update):
 
     image_extensions = {'.png', '.jpg'}
     document_extensions = {'.gif', '.pdf'}
-    video_extensions = {'.mp4'}
+    video_extensions = {'.mp4', '.mov'}
 
     msgent = update['message']['entities'][0]
     msgoffset = msgent['offset']
@@ -380,23 +382,31 @@ def send_media_from_url(bot, update):
     # it also changes urls from rapflame.ddns.net:8080 to a proxy URL, because tg can't handle different port numbers...
     if posixpath.splitext(urllib.parse.urlparse(url).path)[1] in image_extensions:
         bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
-        if 'rapflame.ddns.net:8080' in url:
-            print('URL from rapflame.ddns.net detected...')
-            url = list(urllib.parse.urlsplit(url))
-            url[1] = 't45.nl/proxy'
-            url = urllib.parse.urlunsplit(url)
-        bot.send_photo(chat_id=update.message.chat_id, photo=url)
+        try:
+            urllib.request.urlretrieve(url, "downloaded_photo.jpg")
+            with open('downloaded_photo.jpg', 'rb') as downloaded_photo:
+                files = {'photo': downloaded_photo}
+                params = {'chat_id': update.message.chat_id}
+                api_url = 'https://api.telegram.org/bot585735982:AAHYbhmYD50QiHfBSZTaCeQVpiNJxmmgiok/sendPhoto'
+                requests.post(api_url, files=files, params=params)
+            os.remove('downloaded_photo.jpg')
+        except BadRequest:
+            bot.send_photo(chat_id=update.message.chat_id, photo=url)
     elif posixpath.splitext(urllib.parse.urlparse(url).path)[1] in document_extensions:
         bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_DOCUMENT)
         bot.send_document(chat_id=update.message.chat_id, document=url)
     elif posixpath.splitext(urllib.parse.urlparse(url).path)[1] in video_extensions:
         bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_VIDEO)
-        if 'rapflame.ddns.net:8080' in url:
-            print('URL from rapflame.ddns.net detected...')
-            url = list(urllib.parse.urlsplit(url))
-            url[1] = 't45.nl/proxy'
-            url = urllib.parse.urlunsplit(url)
-        bot.send_video(chat_id=update.message.chat_id, video=url)
+        try:
+            urllib.request.urlretrieve(url, "downloaded_video.mp4")
+            with open('downloaded_video.mp4', 'rb') as downloaded_video:
+                files = {'video': downloaded_video}
+                params = {'chat_id': update.message.chat_id}
+                api_url = 'https://api.telegram.org/bot585735982:AAHYbhmYD50QiHfBSZTaCeQVpiNJxmmgiok/sendVideo'
+                requests.post(api_url, files=files, params=params)
+            os.remove('downloaded_video.mp4')
+        except BadRequest:
+            bot.send_video(chat_id=update.message.chat_id, video=url)
 
 
 # Command Handlers
