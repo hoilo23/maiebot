@@ -122,6 +122,10 @@ def getid(bot, update, args):
 def send_tweet(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
+    if not args:
+        bot.send_message(chat_id=update.message.chat_id, text='Please enter some text to tweet')
+        return
+
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
