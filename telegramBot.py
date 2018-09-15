@@ -138,6 +138,10 @@ def send_tweet(bot, update, args):
 def search_ddg(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
+    if not args:
+        bot.send_message(chat_id=update.message.chat_id, text='Please enter some keywords')
+        return
+
     # join the list of words into a single string with '+' between every word
     all_keywords = '+'.join(args)
 
@@ -221,6 +225,7 @@ def grouppic(bot, update):
     profile_pic.download('avatar.jpg')
     with open('avatar.jpg', 'rb') as file:
         bot.set_chat_photo(update.message.chat_id, file)
+    os.remove('avatar.jpg')
 
 
 # Replies to a file with a http link to that same file.
