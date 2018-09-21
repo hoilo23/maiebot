@@ -112,10 +112,10 @@ def getid(bot, update, args):
     new_message(update.message.from_user.username, update.message.text)
 
     if not args:
-        bot.send_message(chat_id=update.message.chat_id, text=update.message.from_user.id)
+        bot.send_message(chat_id=update.message.chat_id, text=f'Your user id is: {update.message.from_user.id}')
         return
     if args[0] == 'group':
-        bot.send_message(chat_id=update.message.chat_id, text=update.message.chat_id)
+        bot.send_message(chat_id=update.message.chat_id, text=f'This group\'s id is: {update.message.chat_id}')
 
 
 # sends args as tweet
@@ -126,12 +126,16 @@ def send_tweet(bot, update, args):
         bot.send_message(chat_id=update.message.chat_id, text='Please enter some text to tweet')
         return
 
+    # join the list of words into a single string
+    all_words = ' '.join(args)
+
+    if len(all_words) > 280:
+        bot.send_message(chat_id=update.message.chat_id, text='Can\'t send tweet, because it is longer than 280 characters')
+        return
+
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
-
-    # join the list of words into a single string
-    all_words = ' '.join(args)
 
     api.update_status(status=all_words)
 
