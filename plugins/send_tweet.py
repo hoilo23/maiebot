@@ -7,6 +7,7 @@ import json
 with open('config.json', 'r') as f:
     config = json.load(f)
 
+username = config['TWITTER']['USERNAME']
 consumer_key = config['TWITTER']['CONSUMER_KEY']
 consumer_secret = config['TWITTER']['CONSUMER_SECRET']
 access_token = config['TWITTER']['ACCESS_TOKEN']
@@ -34,4 +35,4 @@ def send_tweet(bot, update, args):
 
     api.update_status(status=all_words)
 
-    bot.send_message(chat_id=update.message.chat_id, text='Tweet send: https://twitter.com/GertKwarckman')
+    bot.send_message(chat_id=update.message.chat_id, text=f'Tweet send: https://twitter.com/{username}')
