@@ -1,22 +1,7 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from telegram import ChatAction
-from telegram.error import BadRequest
-import random
-import posixpath
-import urllib.parse
-import requests
-import string
-from datetime import datetime
-from bs4 import BeautifulSoup
-import os  # used for os.remove
-from functools import wraps
-import ftplib  # used for /upload
 import json  # used for the config.json file
 import logging
-import tweepy  # used by /tweet command
-import urllib.request
-
-# from plugins import send_help, get_quote, add_quote
+# import all plugins
 from plugins import *
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -40,9 +25,6 @@ access_token_secret = config['TWITTER']['ACCESS_TOKEN_SECRET']
 
 updater = Updater(token=api_key)
 dispatcher = updater.dispatcher
-
-
-
 
 
 # Command Handlers

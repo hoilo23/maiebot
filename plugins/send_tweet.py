@@ -33,6 +33,6 @@ def send_tweet(bot, update, args):
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
 
-    api.update_status(status=all_words)
+    tweet = api.update_status(status=all_words)
 
-    bot.send_message(chat_id=update.message.chat_id, text=f'Tweet send: https://twitter.com/{username}')
+    bot.send_message(chat_id=update.message.chat_id, text=f'Tweet send: https://twitter.com/statuses/{tweet.id}')
