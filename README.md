@@ -9,7 +9,7 @@ Installation
 Download the latest version [here](https://github.com/hoilo23/maiebot/releases/latest).   
 Extract it, and you can run the program like:    
 
-    python telegramBot.py
+    python main.py
     
 Before the bot will work, you also need to add your api key to config.json.example and rename it to config.json
 

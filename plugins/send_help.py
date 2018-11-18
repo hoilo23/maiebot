@@ -21,5 +21,6 @@ def send_help(bot, update):
     /echo - Echoes your message
     /tweet - Tweet your message.
     /getid [group] - Get your user id, or the groups id.
+    /rate - Lets you rate something. 
     '''
     bot.send_message(chat_id=update.message.chat_id, text=all_commands)
