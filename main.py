@@ -44,6 +44,6 @@ dispatcher.add_handler(CommandHandler('echo', echo.echo, pass_args=True))
 dispatcher.add_handler(CommandHandler('tweet', send_tweet.send_tweet, pass_args=True))
 dispatcher.add_handler(CommandHandler('getid', get_id.get_id, pass_args=True))
 dispatcher.add_handler(CommandHandler('rate', rate.rate, pass_args=True))
-dispatcher.add_handler(MessageHandler((Filters.entity('url')), send_media_from_url))
+dispatcher.add_handler(MessageHandler((Filters.entity('url')), send_media_from_url.send_media_from_url))
 
 updater.start_polling(clean=True)
