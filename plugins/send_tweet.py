@@ -1,4 +1,4 @@
-from plugins import new_message
+from plugins import new_message, restricted
 import tweepy
 import json
 
@@ -15,6 +15,7 @@ access_token_secret = config['TWITTER']['ACCESS_TOKEN_SECRET']
 
 
 # sends args as tweet
+@restricted.restricted
 def send_tweet(bot, update, args):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
