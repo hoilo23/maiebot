@@ -35,7 +35,7 @@ def send_ig_post(bot, update, args):
             for idx, posts in enumerate(api):
                 url = api[str(idx)]['message']
                 caption = api[str(idx)]['caption']
-                if url[idx][-4:] == '.jpg':
+                if url[-4:] == '.jpg':
                     bot.send_photo(chat_id=update.message.chat_id, photo=url, caption=f"{caption} \n*By {user}*", parse_mode='markdown')
                 else:
                     bot.send_video(chat_id=update.message.chat_id, video=url, caption=f"{caption} \n*By {user}*", parse_mode='markdown')
