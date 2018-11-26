@@ -34,10 +34,11 @@ def send_media_from_url(bot, update):
         username = posixpath.splitext(urllib.parse.urlparse(url).path)[0].replace('/', '')
         if username != '':
             bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
-            url = f'http://rapflame.ddns.net:8080/pf/pf-full.php?user={username}'
+            url = f'http://rapflame.ddns.net:8080/api/ava.php?user={username}'
             r = requests.get(url)
-            soup = BeautifulSoup(r.text, 'lxml')
-            image = soup.find('img')['src']
+            api = r.json()
+            image = api['url']
+
             bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
     # checks every received URL if it is a direct link to a file, and returns the file itself if it is
