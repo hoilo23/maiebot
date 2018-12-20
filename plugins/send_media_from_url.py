@@ -7,6 +7,13 @@ import urllib.request
 from bs4 import BeautifulSoup
 import requests
 import os
+import json
+
+# load config.json
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+api_key = config['TELEGRAM']['API_KEY']
 
 
 # send image as file
@@ -35,6 +42,7 @@ def send_media_from_url(bot, update):
         if username != '':
             bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
             url = f'http://rapflame.ddns.net:8080/api/ava.php?user={username}'
+            print(username)
             r = requests.get(url)
             api = r.json()
             image = api['url']
@@ -49,7 +57,7 @@ def send_media_from_url(bot, update):
             with open('downloaded_photo.jpg', 'rb') as downloaded_photo:
                 files = {'photo': downloaded_photo}
                 params = {'chat_id': update.message.chat_id}
-                api_url = 'https://api.telegram.org/bot585735982:AAHYbhmYD50QiHfBSZTaCeQVpiNJxmmgiok/sendPhoto'
+                api_url = f'https://api.telegram.org/bot{api_key}/sendPhoto'
                 requests.post(api_url, files=files, params=params)
             os.remove('downloaded_photo.jpg')
         except BadRequest:
@@ -64,7 +72,7 @@ def send_media_from_url(bot, update):
             with open('downloaded_video.mp4', 'rb') as downloaded_video:
                 files = {'video': downloaded_video}
                 params = {'chat_id': update.message.chat_id}
-                api_url = 'https://api.telegram.org/bot585735982:AAHYbhmYD50QiHfBSZTaCeQVpiNJxmmgiok/sendVideo'
+                api_url = f'https://api.telegram.org/bot{api_key}/sendVideo'
                 requests.post(api_url, files=files, params=params)
             os.remove('downloaded_video.mp4')
         except BadRequest:
