@@ -21,7 +21,7 @@ def send_media_from_url(bot, update):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
     image_extensions = {'.png', '.jpg'}
-    document_extensions = {'.gif', '.pdf'}
+    document_extensions = {'.gif', '.pdf', '.zip'}
     video_extensions = {'.mp4', '.mov'}
 
     msgent = update['message']['entities'][0]
