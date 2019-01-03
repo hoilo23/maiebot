@@ -53,7 +53,7 @@ def send_media_from_url(bot, update):
         img_name = url[-6:]
         if img_name != '':
             bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
-            image = f'https://t45.nl/image/?id={img_name}'
+            image = f'https://t45.nl/3/{img_name}.png'
             bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
     # checks every received URL if it is a direct link to a file, and returns the file itself if it is
