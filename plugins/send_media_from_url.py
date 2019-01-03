@@ -46,7 +46,14 @@ def send_media_from_url(bot, update):
             r = requests.get(url)
             api = r.json()
             image = api['url']
+            bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
+    # checks t45 url and send the image
+    elif 'https://t45.nl/image/?id=' in url:
+        img_name = url[-6:]
+        if img_name != '':
+            bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
+            image = f'https://t45.nl/image/?id={img_name}'
             bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
     # checks every received URL if it is a direct link to a file, and returns the file itself if it is
