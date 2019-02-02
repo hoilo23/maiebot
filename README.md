@@ -1,6 +1,28 @@
 # maiebot
 
-A telegram bot built using python-telegram-bot, made to replace this [old bot](https://github.com/yagop/telegram-bot)
+A telegram bot built using python-telegram-bot, made to replace [yagop telegram bot](https://github.com/yagop/telegram-bot), which is unmaintained/deprecated.
+
+
+Plugins
+------------
+
+Currently supported plugins from [yagop bot](https://github.com/yagop/telegram-bot):
+ - dogify
+ - echo
+ - send media from url
+ - google
+ - help
+ - id
+ - isup
+ - kickme
+ - magic8ball
+ - quotes
+ - tweet
+
+New plugins:
+ - set group avatar
+ - wheeldecide
+ - rate
 
 
 Installation
