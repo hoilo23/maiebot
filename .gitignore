@@ -1,0 +1,6 @@
+
+*.iml
+*.xml
+config.json
+/venv/*
+/plugins/__pycache__/*
