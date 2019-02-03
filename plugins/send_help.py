@@ -9,14 +9,12 @@ def send_help(bot, update):
     Available commands:
     /quote - Send a random quote
     /addquote - Add a new quote
-    /google - Send a google url
+    /google - Send google results
     /magic8ball - magic8Ball
     /wheeldecide - Randomly choose an option
     /dogify - Create a doge image with your words
     /kickme - Kick you from the chat
     /setpic - Set the picture you replied to as group avatar
-    /upload - Uploads the file you replied to, and returns the URL
-    /delete_all_files - Deletes all of the uploaded files in the FTP.
     /isup - Checks if a URL is working or not
     /echo - Echoes your message
     /tweet - Tweet your message.

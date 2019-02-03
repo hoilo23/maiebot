@@ -6,10 +6,8 @@ import random
 def wheeldecide(bot, update, args):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
-    list_of_decisions = [word for word in args]
-
-    if not list_of_decisions:
-        bot.send_message(chat_id=update.message.chat_id, text='Please enter text!')
+    if len(args) < 2:
+        bot.send_message(chat_id=update.message.chat_id, parse_mode='markdown', text='Usage: `/wheeldecide <option 1> <option 2>`')
     else:
         bot.send_message(chat_id=update.message.chat_id,
-                         text=list_of_decisions[random.randint(0, len(list_of_decisions) - 1)])
+                         text=args[random.randint(0, len(args) - 1)])
