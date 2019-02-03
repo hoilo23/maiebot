@@ -20,7 +20,7 @@ def send_tweet(bot, update, args):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
     if not args:
-        bot.send_message(chat_id=update.message.chat_id, text='Please enter some text to tweet')
+        bot.send_message(chat_id=update.message.chat_id, parse_mode='markdown', text='Usage: `/tweet <your tweet>`')
         return
 
     # join the list of words into a single string

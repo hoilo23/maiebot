@@ -9,7 +9,7 @@ def search_ddg(bot, update, args):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
     if not args:
-        bot.send_message(chat_id=update.message.chat_id, text='Please enter some keywords')
+        bot.send_message(chat_id=update.message.chat_id, parse_mode='markdown', text='Usage: `/google <keyword(s)>`')
         return
 
     # join the list of words into a single string with '+' between every word
