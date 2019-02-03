@@ -4,7 +4,6 @@ from telegram.error import BadRequest
 import posixpath
 import urllib.parse
 import urllib.request
-from bs4 import BeautifulSoup
 import requests
 import os
 import json
@@ -20,6 +19,7 @@ api_key = config['TELEGRAM']['API_KEY']
 def send_media_from_url(bot, update):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
+    # file extentions it will look for
     image_extensions = {'.png', '.jpg'}
     document_extensions = {'.gif', '.pdf', '.zip'}
     video_extensions = {'.mp4', '.mov'}
@@ -27,6 +27,7 @@ def send_media_from_url(bot, update):
     msgent = update['message']['entities'][0]
     msgoffset = msgent['offset']
     msglength = msgent['length']
+    # gets the url out of the message even if the message contains other text too
     url = update['message']['text']
     url = url[int(msgoffset):]
     url = url[:int(msglength)]
@@ -35,26 +36,6 @@ def send_media_from_url(bot, update):
     if 'https://www.instagram.com/p/' in url:
         bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
         bot.send_photo(chat_id=update.message.chat_id, photo=url)
-
-    # checks Instagram username and sends full res avatar
-    elif 'https://www.instagram.com' in url:
-        username = posixpath.splitext(urllib.parse.urlparse(url).path)[0].replace('/', '')
-        if username != '':
-            bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
-            url = f'http://rapflame.ddns.net:8080/api/ava.php?user={username}'
-            print(username)
-            r = requests.get(url)
-            api = r.json()
-            image = api['url']
-            bot.send_photo(chat_id=update.message.chat_id, photo=image)
-
-    # checks t45 url and send the image
-    elif 'https://t45.nl/image/?id=' in url:
-        img_name = url[-6:]
-        if img_name != '':
-            bot.send_chat_action(update.message.chat_id, ChatAction.UPLOAD_PHOTO)
-            image = f'https://t45.nl/3/{img_name}.png'
-            bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
     # checks every received URL if it is a direct link to a file, and returns the file itself if it is
     if posixpath.splitext(urllib.parse.urlparse(url).path)[1] in image_extensions:

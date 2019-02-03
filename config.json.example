@@ -4,11 +4,6 @@
     "API_KEY": "your-api-key",
     "LIST_OF_ADMINS": [your-telegram-id, other-telegram-id],
   },
-  "FTP": {
-    "URL": "your-domain-name",
-    "USERNAME": "your-ftp-username"
-	"PASSWORD": "your-ftp-password",
-  },
   "TWITTER": {
     "USERNAME" : "your-twitter-username",
     "CONSUMER_KEY": "your-consumer-key",
