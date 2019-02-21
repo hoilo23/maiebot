@@ -31,8 +31,11 @@ Installation
 Download the latest version [here](https://github.com/hoilo23/maiebot/releases/latest).   
 Extract it, and you can run the program like:    
 
-    python main.py
+```
+python __main__.py
+```
     
+You can quit the bot like any other Python program, using `Ctrl + Break`   
 Before the bot will work, you also need to add your api key to config.json.example and rename it to config.json
 
 
@@ -42,6 +45,8 @@ Requirements
  - Python 3.6 or higher
  - All packages in requirements.txt, which can be installed by running   
 
-
-    pip install -r requirements.txt
+```
+pip install -r requirements.txt
+```
     
+Don't hesitate to open an issue if you're running into problems.
