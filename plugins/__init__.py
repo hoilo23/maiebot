@@ -1,10 +1,18 @@
-# the list of currently used plugins # don't forget to add new plugins here
-plugin_list = ['add_quote', 'dogify', 'echo', 'get_id', 'get_quote', 'isup', 'kickme', 'magic8ball',
-               'new_message', 'restricted', 'search_ddg', 'send_help', 'send_media_from_url', 'send_tweet',
-               'set_group_avatar', 'wheeldecide', 'rate']
+import os
 
-plugins = '\n'.join(plugin_list)
-print(f"Currently installed plugins: \n{plugins}")
+# the list of currently used plugins
+if os.path.isfile('./config.json'):
+    dir_list = os.listdir("plugins")
+    plugin_list = []
+    for file_name in dir_list:
+        if file_name[0] != "_":
+            plugin_list.append(file_name[:-3])
 
+    plugins = '\n'.join(plugin_list)
+    print(f"Currently installed plugins: \n{plugins}")
 
-__all__ = plugin_list
+    __all__ = plugin_list
+else:
+    print("No config.json file found, make sure to add your info to config.json.example and rename it to config.json")
+    quit()
+
