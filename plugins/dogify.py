@@ -1,9 +1,12 @@
-from plugins import new_message
+from plugins import new_message, enable_check
 
 
 # dogify
 def dogify(bot, update, args):
     new_message.new_message(update.message.from_user.username, update.message.text)
+
+    if enable_check.enable_check(__name__):
+        return
 
     # join the list of words into a single string
     if not args:

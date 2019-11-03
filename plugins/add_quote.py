@@ -1,10 +1,13 @@
-from plugins import new_message
+from plugins import new_message, enable_check
 import os
 
 
 # opens quotes_chat_id.txt and appends the quote
 def add_quote(bot, update, args):
     new_message.new_message(update.message.from_user.username, update.message.text)
+
+    if enable_check.enable_check(__name__):
+        return
 
     if not os.path.exists('quotes'):
         os.makedirs('quotes')

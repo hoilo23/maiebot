@@ -10,5 +10,5 @@
     "CONSUMER_SECRET": "your-secret-consumer-key",
     "ACCESS_TOKEN": "your-access-token",
 	"ACCESS_TOKEN_SECRET": "your-secret-access-token"
-  },
+  }
 }

@@ -1,10 +1,13 @@
-from plugins import new_message
+from plugins import new_message, enable_check
 import random
 
 
 # sends a random reply from the list
 def magic8ball(bot, update):
     new_message.new_message(update.message.from_user.username, update.message.text)
+
+    if enable_check.enable_check(__name__):
+        return
 
     answers = ['It is certain', 'It is decidedly so', 'Without a doubt',
                'Yes definitely', 'You may rely on it', 'As I see it, yes',

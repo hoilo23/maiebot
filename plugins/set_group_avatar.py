@@ -1,10 +1,13 @@
-from plugins import new_message
+from plugins import new_message, enable_check
 import os
 
 
 # sets image in reply as group picture
 def set_group_avatar(bot, update):
     new_message.new_message(update.message.from_user.username, update.message.text)
+
+    if enable_check.enable_check(__name__):
+        return
 
     if update['message']['reply_to_message'] is None:
         bot.send_message(chat_id=update.message.chat_id, parse_mode='markdown', text='Usage: `/setpic (as a reply to an image)`')

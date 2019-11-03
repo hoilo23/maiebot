@@ -1,4 +1,4 @@
-from plugins import new_message
+from plugins import new_message, enable_check
 from telegram import ChatAction
 from telegram.error import BadRequest
 import posixpath
@@ -18,6 +18,9 @@ api_key = config['TELEGRAM']['API_KEY']
 # send image as file
 def send_media_from_url(bot, update):
     new_message.new_message(update.message.from_user.username, update.message.text)
+
+    if enable_check.enable_check(__name__):
+        return
 
     # file extentions it will look for
     image_extensions = {'.png', '.jpg'}
