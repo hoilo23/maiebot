@@ -18,6 +18,7 @@ Currently supported plugins from [yagop bot](https://github.com/yagop/telegram-b
  - magic8ball
  - quotes
  - tweet
+ - plugin
 
 New plugins:
  - set group avatar
