@@ -32,7 +32,7 @@ Download the latest version [here](https://github.com/hoilo23/maiebot/releases/l
 Extract it, and you can run the program like:    
 
 ```
-python __main__.py
+python maiebot.py
 ```
     
 You can quit the bot like any other Python program, using `Ctrl + Break`   
