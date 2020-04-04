@@ -3,7 +3,7 @@ import random
 
 
 # sends a random reply from the list
-def magic8ball(bot, update):
+def magic8ball(update, context):
     new_message.new_message(update.message.from_user.username, update.message.text)
 
     if enable_check.enable_check(__name__):
@@ -16,4 +16,4 @@ def magic8ball(bot, update):
                'Better not tell you now', 'Cannot predict now',
                'Concentrate and ask again', 'Don\'t count on it',
                'My reply is no', 'My sources say no', 'Outlook not so good', 'Very doubtful']
-    bot.send_message(chat_id=update.message.chat_id, text=answers[random.randint(0, len(answers) - 1)])
+    context.bot.send_message(chat_id=update.message.chat_id, text=answers[random.randint(0, len(answers) - 1)])

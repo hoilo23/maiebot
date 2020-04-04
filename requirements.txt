@@ -1,6 +1,7 @@
+PyYAML==5.3.1
 beautifulsoup4==4.6.1
-lxml==4.2.4
+lxml==4.5.0
 requests==2.20.0
 telegram==0.0.1
 tweepy==3.7.0
-python-telegram-bot==11.1.0
+python-telegram-bot==12.4.2

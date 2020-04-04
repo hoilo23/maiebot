@@ -1,7 +1,6 @@
-
 *.iml
 *.xml
-config.json
+config.yaml
 /venv/*
 /plugins/__pycache__/*
 /quotes/*

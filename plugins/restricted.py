@@ -1,21 +1,21 @@
 from functools import wraps
-import json
+import yaml
 
 
-# load config.json
-with open('config.json', 'r') as f:
-    config = json.load(f)
+# load config.yaml
+with open('config.yaml', 'r') as f:
+    config = yaml.full_load(f)
 
 list_of_admins = config['TELEGRAM']['LIST_OF_ADMINS']
 
 
 def restricted(func):
     @wraps(func)
-    def wrapped(bot, update, *args, **kwargs):
+    def wrapped(update, context, *args, **kwargs):
         user_id = update.effective_user.id
         if user_id not in list_of_admins:
             print(f'Unauthorized access denied for {update.effective_user.id}.')
-            bot.send_message(chat_id=update.message.chat_id, text='Permission denied')
+            context.bot.send_message(chat_id=update.message.chat_id, text='Permission denied')
             return
-        return func(bot, update, *args, **kwargs)
+        return func(update, context, *args, **kwargs)
     return wrapped
