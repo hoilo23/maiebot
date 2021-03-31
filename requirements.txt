@@ -1,6 +1,6 @@
 PyYAML==5.3.1
 beautifulsoup4==4.6.1
-lxml==4.5.0
+lxml==4.6.3
 requests==2.20.0
 telegram==0.0.1
 tweepy==3.7.0
